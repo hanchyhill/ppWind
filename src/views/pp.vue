@@ -1,0 +1,115 @@
+<template>
+  <div class="index">
+    起报时间
+    <DatePicker type="date" :options="dateOption" placeholder="选择日期" 
+    style="width: 200px">
+    </DatePicker>
+    <Select v-model="model1" style="width:200px">
+        <Option v-for="item of validTime" :value="item.value" :key="item.value">{{ item.label }}</Option>
+    </Select>
+    <Button type="primary" icon="ios-search">查询</Button>
+    <Button type="primary" icon="images">图形显示</Button>
+    <!--<Row type="flex" justify="center" align="middle">-->
+    <Row type="flex" >
+      <Col span="24">
+        <Table :columns="tableTitle" :data="tableData" size="large">
+        </Table>
+      </Col>
+    </Row>
+  </div>
+</template>
+<script>
+import axios from 'axios';
+  export default {
+    name: 'pp-Main',
+    data () {
+      let tableTitle = [{title: '预报时间',key: 'time'},
+                          {title: '粤东海面',key: 'east'},
+                          {title: '粤中海面',key: 'middle'},
+                          {title: '粤西海面',key: 'west'},
+                          {title: '类型',key: 'type'},
+                          ];
+      
+      let tableData = [{time:'10月29日08时',east:'7级',middle:'6级'},
+                       {time:'10月29日11时',east:'8级',middle:'7级', west:'6级'},
+                       {time:'10月30日02时',east:'7级',middle:'6级',type:'东部型'}];
+      const dateOption = {
+        shortcuts: [
+          {
+            text: '今天',
+            value () {
+              return new Date();
+            },
+          },
+          {
+            text: '昨天',
+            value () {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24);
+              return date;
+            },
+          },
+          {
+            text: '一周前',
+            value () {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+              return date;
+            },
+          }
+        ]
+      }
+
+      const validTime = [{value:'00', label:'00 UTC'}, {value:'12', label:'12 UTC'}];
+      return {
+        tableTitle,
+        tableData,
+        dateOption,
+        validTime,
+      }
+    },
+    methods: {
+      getData(){
+        axios.get('/api/ppWind?model=ECMWF-thin')
+        .then((res)=>{
+
+        })
+        .catch(err=>{
+
+        })
+      }
+    },
+    created(){},
+  };
+</script>
+<style scoped>
+    .index {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        text-align: center;
+    }
+
+    .index h1 {
+        height: 150px;
+    }
+
+    .index h1 img {
+        height: 100%;
+    }
+
+    .index h2 {
+        color: #666;
+        margin-bottom: 200px;
+    }
+
+    .index h2 p {
+        margin: 0 0 50px;
+    }
+
+    .index .ivu-row-flex {
+        height: 100%;
+    }
+</style>
