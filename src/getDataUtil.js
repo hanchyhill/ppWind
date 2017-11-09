@@ -100,7 +100,7 @@ const MiddleType= (dataPack) => {
     mw,
     om:m,
     ow:w,
-    type:'middle',
+    // type:'middle',
   };
 }
 
@@ -170,7 +170,7 @@ function EastType(dataPack){
     mw,
     om:m,
     ow:w,
-    type:'east',
+    // type:'east',
   };
 }
 
@@ -216,12 +216,12 @@ function WestType(dataPack){
     mw:middleWest(pw5w6,w6),
     om:-1,
     ow:-1,
-    type:'west',
+    // type:'west',
   };
 }
 
-function getData(){
-  let demoURL = 'http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetDataTimeSerialGroup&modelid=ecmwfthin&element=mslp&level=0&starttime=2017-10-28 12:00:00&endtime=2017-11-01 12:00:00&lon=107.5 107.5&lat=32.5 30.0';
+function getData(start,end){
+  // let demoURL = 'http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetDataTimeSerialGroup&modelid=ecmwfthin&element=mslp&level=0&starttime=2017-10-28 12:00:00&endtime=2017-11-01 12:00:00&lon=107.5 107.5&lat=32.5 30.0';
   let startTime = '2017-11-02 12:00:00';
   let endTime = '2017-11-05 12:00:00';
   let lon = [].concat(pointW, pointC, pointE).map(v=>v[0]).join(' ');
@@ -229,26 +229,28 @@ function getData(){
   let mslpURL = encodeURI(`http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetDataTimeSerialGroup&modelid=ecmwfthin&element=mslp&level=0&starttime=${startTime}&endtime=${endTime}&lon=${lon}&lat=${lat}`);
   let w6URL = encodeURI(`http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=ecmwfthin&element=u10m%20v10m&level=0&starttime=${startTime}&endtime=${endTime}&lon=${pointW[5][0]}&lat=${pointW[5][1]}`);
   // console.log(w6URL);
-  axios.all([axios.get(mslpURL),axios.get(w6URL)])
-    .then(axios.spread((res1,res2)=>{
-      const data = res1.data;
-      if(!data.DATA||data.RET<0) return Promise.reject('获取的数据无法解析01');
-      const data2 = res2.data;
-      if(!data2.DATA||data.RET<0) return Promise.reject('获取的数据无法解析02');
-      resolveData(data.DATA, data2.DATA);
-      // switch case 0 1 2 -> w c e
-      // return [wP, cP, eP];
-    }))
-    .catch(err=>{
-      console.error(err);
-    });
+  return new Promise((resolve,reject)=>{
+    axios.all([axios.get(mslpURL),axios.get(w6URL)])
+      .then(axios.spread((res1,res2)=>{
+        const data = res1.data;
+        if(!data.DATA||data.RET<0) reject('获取的数据无法解析01');
+        const data2 = res2.data;
+        if(!data2.DATA||data.RET<0) reject('获取的数据无法解析02');
+        resolve([data.DATA, data2.DATA]);
+        // switch case 0 1 2 -> w c e
+        // return [wP, cP, eP];
+      }))
+      .catch(err=>{
+        reject(err);
+      });
+  }); // promise 结束
 }
 
 function resolveData(list,wind10m){ //list -> 气压序列，data2->u10m,v10m
   const eachLength = [pointW.length, pointC.length, pointE.length];
   const totalPoints = SUM(eachLength);//一共几个点
   let pointLength = list.length/totalPoints;//每个点的时间长度
-  console.log(pointLength);
+  console.log('长度'+pointLength);
   let pointsList = [];
   for(let i = 0; i<totalPoints;i++){
     pointsList.push(list.slice(i*pointLength, (i+1)*pointLength));
@@ -294,7 +296,7 @@ function resolveData(list,wind10m){ //list -> 气压序列，data2->u10m,v10m
     }
   })
 
-console.log(dataPack);
+//  console.log(dataPack);
   let windList = dataPack.map(data=>{
     switch(data.type){
       case 0: // 西部型
@@ -307,11 +309,34 @@ console.log(dataPack);
         return EastType(data);
         break;
       default:
-        return Promise.reject('分型错误');
+        throw new Error('分型错误');
     }
   });
-   console.log(windList);
+
+  const listMix = windList.map((obj,i)=>{
+    return Object.assign({}, obj, {time:dataPack[i].time,type:dataPack[i].type});
+  })
+   //console.log(windList);
+   // TODO: assign datapack中数据。
+   return listMix;
 }
 
-getData();
+async function getWind(start,end){
+  try {
+    const list = await getData(start,end);
+    return resolveData(list[0], list[1]);
+  } catch (err) {
+    throw new Error(err);
+  }
+  
+}
+
+exports.getWind = getWind;
+/* getWind()
+  .then(windList=>{
+    console.log(windList);
+  })
+  .catch(err=>{
+    console.error(err);
+  }) */
 //console.log(mslpURL);

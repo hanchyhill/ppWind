@@ -6,4 +6,6 @@ let config = {
     assetsPublicPath: '/',
     proxyTable: {'/api/':'http://localhost:10073'},
 };
+
+// console.log('proxy /api/ :10073');
 export default config;
