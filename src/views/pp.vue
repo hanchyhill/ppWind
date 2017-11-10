@@ -20,7 +20,7 @@
     <!--<Row type="flex" justify="center" align="middle">-->
     <Row type="flex" >
       <Col span="24">
-        <Table :columns="tableTitle" :data="tableData" size="large">
+        <Table :columns="tableTitle" :data="tableData">
         </Table>
       </Col>
     </Row>
