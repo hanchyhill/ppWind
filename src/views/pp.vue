@@ -69,16 +69,26 @@ import axios from 'axios';
       }
 
       const validTime = [{value:'00', label:'00 UTC'}, {value:'12', label:'12 UTC'}];
+      let iniTime = new Date();
+      let suffixTime = 3<=iniTime.getHours()&&fitTime.getHours()<15 ? {case:0,date:-1,hour:'12'}:{case:1,date:0,hour:'00'};//
+
+      let startDate = iniTime.getFullYear().toString() + '-' +
+                      (Array(2).join('0') + (iniTime.getMonth()+1)).slice(-2) + '-' +
+                      (Array(2).join('0') + (iniTime.getDate()+suffixTime.date)).slice(-2);
+      let endDate = iniTime.getFullYear().toString() + '-' +
+                    (Array(2).join('0') + (iniTime.getMonth()+1)).slice(-2) + '-' +
+                    (Array(2).join('0') + (iniTime.getDate()-suffixTime.date+3)).slice(-2);
+      let [startHour,endHour] = [suffixTime.hour,suffixTime.hour];
+
       return {
         tableTitle,
-        // tableData,
         dateOption,
         validTime,
         rawData:[],
-        startHour:'',
-        endHour:'',
-        startDate:'2016-01-01',
-        endDate:'2016-01-01',
+        startHour,
+        endHour,
+        startDate,
+        endDate,
       }
     },
     methods: {
@@ -129,7 +139,7 @@ import axios from 'axios';
             break;
           default:
             return '';
-            console.error('错误的类型type');
+            console.error(`错误的类型: ${type}`);
         }
       },
       changeDate(formatDate,which){
@@ -144,6 +154,8 @@ import axios from 'axios';
       }
     },
     created(){
+      let fullUrl = `http://localhost:10073/api/getData?start=${this.startString}&end=${this.endString}&model=ecthin`;
+      console.log(fullUrl);
       axios.get('http://localhost:10073/api/getData?start=2017-10-28 12:00:00&end=2017-11-01 12:00:00')
       .then(res=>{
         this.rawData = res.data;
@@ -170,7 +182,13 @@ import axios from 'axios';
           }
         });
         return transData;
-      }
+      },
+      startString(){
+        return this.startDate+' '+this.startHour+':00:00';
+      },
+      endString(){
+        return this.endDate+' '+this.endHour+':00:00';
+      },
     },
   };
 </script>

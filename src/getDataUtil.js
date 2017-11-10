@@ -38,7 +38,7 @@ const MiddleType= (dataPack) => {
   const pe3e6 = dataPack.pe3e6;
   const pe5c5 = dataPack.pe5c5;
   const pc5w6 = dataPack.pc5w6;
-
+// 1-> 6级; 2 -> 7级; 3 -> 8级; 4 -> 6级及以上;7 -> 7级及以上; 0 -> 无大风
   function middleWest(pw5w6, w6){
     if(pw5w6 < 4.0 && pw5w6 <= 7.0 && w6){
       return 1;
@@ -220,10 +220,10 @@ function WestType(dataPack){
   };
 }
 
-function getData(start,end){
+function getData(startTime="2017-11-02 12:00:00", endTime="2017-11-05 12:00:00"){
   // let demoURL = 'http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetDataTimeSerialGroup&modelid=ecmwfthin&element=mslp&level=0&starttime=2017-10-28 12:00:00&endtime=2017-11-01 12:00:00&lon=107.5 107.5&lat=32.5 30.0';
-  let startTime = '2017-11-02 12:00:00';
-  let endTime = '2017-11-05 12:00:00';
+  // let startTime = '2017-11-02 12:00:00';
+  // let endTime = '2017-11-05 12:00:00';
   let lon = [].concat(pointW, pointC, pointE).map(v=>v[0]).join(' ');
   let lat = [].concat(pointW, pointC, pointE).map(v=>v[1]).join(' ');
   let mslpURL = encodeURI(`http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetDataTimeSerialGroup&modelid=ecmwfthin&element=mslp&level=0&starttime=${startTime}&endtime=${endTime}&lon=${lon}&lat=${lat}`);

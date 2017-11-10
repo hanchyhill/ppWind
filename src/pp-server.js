@@ -17,7 +17,7 @@ apiRouter.route('/:apiName')
     case 'getData': // 获取数据
       const startTime = req.query.start;
       const endTime = req.query.end;
-      getWind()
+      getWind(startTime, endTime)
       .then(resData=>{
         res.send(JSON.stringify(resData))
       })
