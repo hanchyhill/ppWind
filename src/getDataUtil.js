@@ -221,6 +221,7 @@ function WestType(dataPack){
 }
 
 function getData(startTime="2017-11-02 12:00:00", endTime="2017-11-05 12:00:00"){
+  // throw new Error('test');
   // let demoURL = 'http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetDataTimeSerialGroup&modelid=ecmwfthin&element=mslp&level=0&starttime=2017-10-28 12:00:00&endtime=2017-11-01 12:00:00&lon=107.5 107.5&lat=32.5 30.0';
   // let startTime = '2017-11-02 12:00:00';
   // let endTime = '2017-11-05 12:00:00';
@@ -233,9 +234,9 @@ function getData(startTime="2017-11-02 12:00:00", endTime="2017-11-05 12:00:00")
     axios.all([axios.get(mslpURL),axios.get(w6URL)])
       .then(axios.spread((res1,res2)=>{
         const data = res1.data;
-        if(!data.DATA||data.RET<0) reject('获取的数据无法解析01');
+        if(!data.DATA||data.RET<0) reject('气压数据为空，无法解析');
         const data2 = res2.data;
-        if(!data2.DATA||data.RET<0) reject('获取的数据无法解析02');
+        if(!data2.DATA||data.RET<0) reject('风速数据为空，无法解析');
         resolve([data.DATA, data2.DATA]);
         // switch case 0 1 2 -> w c e
         // return [wP, cP, eP];
@@ -246,21 +247,45 @@ function getData(startTime="2017-11-02 12:00:00", endTime="2017-11-05 12:00:00")
   }); // promise 结束
 }
 
+function testSameLength(first,...latter){
+  for (let current of latter) {
+    if (first.length !== current.length) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function resolveData(list,wind10m){ //list -> 气压序列，data2->u10m,v10m
   const eachLength = [pointW.length, pointC.length, pointE.length];
   const totalPoints = SUM(eachLength);//一共几个点
   let pointLength = list.length/totalPoints;//每个点的时间长度
-  console.log('长度'+pointLength);
+  console.log('每个点原始长度'+pointLength);
   let pointsList = [];
   for(let i = 0; i<totalPoints;i++){
     pointsList.push(list.slice(i*pointLength, (i+1)*pointLength));
   }
+  // 确认气压有效值
   let validList = pointsList.map(v=>v.reduce((ac,value,index)=>{
     if(value>0) ac.push([index,value]);
     return ac;
   },[]));// 剔除-999数值,返回时次-数值对
   // console.log(validList);
 
+
+  
+  // w6风向
+  // 确认风向风速有效值
+  const w6Raw = [wind10m.slice(0,wind10m.length/2),wind10m.slice(wind10m.length/2)];
+  const validW6 = w6Raw.map(v=>v.reduce((ac,value,index)=>{ 
+    if(value>-990) ac.push([index,value]);
+    return ac;
+  },[]));// [[i,u10m], [i,v10m]]
+
+  // 确认风和气压有效值是否一样多，否则抛出错误。
+  const isTheSameLength = testSameLength(...validList,...validW6)
+  console.log(`is the same length? ${isTheSameLength}`);
+  if(!isTheSameLength) throw new Error('不同要素有效长度不同，发生错误');
   let wP = validList.slice(0,eachLength[0]);// pointsNum,[i,v]
   let cP = validList.slice(eachLength[0],eachLength[0]+eachLength[1]);
   let eP = validList.slice(eachLength[0]+eachLength[1]);
@@ -268,13 +293,7 @@ function resolveData(list,wind10m){ //list -> 气压序列，data2->u10m,v10m
   let wSumP = wP[0].map((v0,i)=>v0[1] + wP[1][i][1] + wP[2][1] + wP[3][1]);
   let cSumP = cP[0].map((v0,i)=>v0[1] + cP[1][i][1] + cP[2][1] + cP[3][1]);
   let eSumP = eP[0].map((v0,i)=>v0[1] + eP[1][i][1] + eP[2][1] + eP[3][1]);
-  
-  // w6风向
-  const w6Raw = [wind10m.slice(0,wind10m.length/2),wind10m.slice(wind10m.length/2)];
-  const validW6 = w6Raw.map(v=>v.reduce((ac,value,index)=>{ 
-    if(value>-990) ac.push([index,value]);
-    return ac;
-  },[]));// [[i,u10m], [i,v10m]]
+
   const w6North = validW6[0].map((u10,i)=>isNorthWind(u10[1],validW6[1][i][1]));
   // TODO,确定所有长度一致，dataPack合成{type,pe3e6,pe5c5,pw5w6,w6}
   

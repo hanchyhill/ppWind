@@ -23,7 +23,7 @@ apiRouter.route('/:apiName')
       })
       .catch(error=>{
         console.log(error);
-        res.status(503).send(JSON.stringify(error));
+        res.status(503).send(error.message);
       })
       break;
     default:// 未获取到时跳到下一个

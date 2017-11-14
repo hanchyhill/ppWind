@@ -10,11 +10,12 @@ util.title = function(title) {
 };
 
 const ajaxUrl = env === 'development' ?
-    'http://127.0.0.1:8888' :
+    'http://127.0.0.1:10073' :
     env === 'production' ?
-    'https://www.url.com' :
-    'https://debug.url.com';
-
+    'http://pp.gdmo.gq' :
+    'http://pp.gdmo.gq';
+//    'https://www.url.com' :
+//    'https://debug.url.com';
 util.ajax = axios.create({
     baseURL: ajaxUrl,
     timeout: 30000
