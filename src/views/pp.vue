@@ -114,7 +114,7 @@ import Util from '../libs/util';
         timeInterval:1,
         intervalList,
         modelList,
-        modelSelected:'ecthin',
+        modelSelected:'ecmwfthin',
         dateOption,
         validTime,
         rawData:[],
@@ -220,7 +220,10 @@ import Util from '../libs/util';
                            (Array(2).join('0') + (transDate.getDate())).slice(-2) + ' ' +
                            (Array(2).join('0') + (transDate.getHours())).slice(-2) + '时';
         return dateString;
-      }
+      },
+      intervalFilter(item){
+        return item.time%this.timeInterval===0?true:false;
+      },
     },
     created(){
       this.getData();
@@ -228,7 +231,8 @@ import Util from '../libs/util';
     computed:{
       tableData(){
         if(this.rawData.length==0) return [];// 如果数组为空直接返回
-        const transData = this.rawData.map(item=>{
+        console.log(this.timeInterval);
+        const transData = this.rawData.filter(this.intervalFilter).map(item=>{
           const time = this.projectTime(item.time);
           const west = this.projectScale(item.w);
           const middle = this.projectScale(item.m);
