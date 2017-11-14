@@ -182,6 +182,23 @@ import Util from '../libs/util';
             console.error('错误的风力等级');
         }
       },
+      projectClassName(...data){
+        classArray = data.map((v,i)=>{
+          
+          const className = v===0? false:
+                            v===1? 'scale6':
+                            v===2? 'scale7':
+                            v===3? 'scale8':
+                            v===4? 'scale6':
+                            v===5? 'scale7':false;
+          if(!className) return null;// 如果不需要添加class返回空
+          const name = i===0?{west:className}:
+                       i===1?{middle:className}:
+                           {west:className};
+          return name;
+        });
+        return Object.assign({}, classArray[0], classArray[1], classArray[2]);
+      }
       projectType(type){
         switch(type){
           case 0:
@@ -238,13 +255,20 @@ import Util from '../libs/util';
           const middle = this.projectScale(item.m);
           const east = this.projectScale(item.e);
           const type = this.projectType(item.type);
-          return {
+          const cellClassName = this.projectClassName(item.w,item.m,item.e);
+          const baseObject = {
             time,
             west,
             middle,
             east,
             type,
           }
+          if(Object.keys(ellClassName).length==0){// Class为空不添加属性
+            return baseObject;
+          }else{
+            return Object.assign({},baseObject,{cellClassName:cellClassName});
+          }
+          
         });
         return transData;
       },
@@ -290,6 +314,17 @@ import Util from '../libs/util';
 
     .larger-font{
       font-size:175%;
+    }
+    .ivu-table .scale6{
+      background-color: #99FBFF;
+
+    }
+    .ivu-table .scale7{
+      background-color: #FFF3AD;
+    }
+    .ivu-table .scale8{
+      background-color: #B23D8A;
+      color: #fff;
     }
     
 </style>
