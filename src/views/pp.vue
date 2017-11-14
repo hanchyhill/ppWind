@@ -38,7 +38,7 @@
     <Row type="flex" >
       <Col span="1"></Col>
       <Col span="22">
-        <Table :columns="tableTitle" :data="tableData" height="800" :loading="tableLoading">
+        <Table :columns="tableTitle" :data="tableData" height="800" :loading="tableLoading" class="pp-table">
         </Table>
       </Col>
       <Col span="1"></Col>
@@ -183,7 +183,7 @@ import Util from '../libs/util';
         }
       },
       projectClassName(...data){
-        classArray = data.map((v,i)=>{
+        const classArray = data.map((v,i)=>{
           
           const className = v===0? false:
                             v===1? 'scale6':
@@ -194,11 +194,11 @@ import Util from '../libs/util';
           if(!className) return null;// 如果不需要添加class返回空
           const name = i===0?{west:className}:
                        i===1?{middle:className}:
-                           {west:className};
+                           {east:className};
           return name;
         });
         return Object.assign({}, classArray[0], classArray[1], classArray[2]);
-      }
+      },
       projectType(type){
         switch(type){
           case 0:
@@ -263,7 +263,7 @@ import Util from '../libs/util';
             east,
             type,
           }
-          if(Object.keys(ellClassName).length==0){// Class为空不添加属性
+          if(Object.keys(cellClassName).length==0){// Class为空不添加属性
             return baseObject;
           }else{
             return Object.assign({},baseObject,{cellClassName:cellClassName});
@@ -315,16 +315,20 @@ import Util from '../libs/util';
     .larger-font{
       font-size:175%;
     }
-    .ivu-table .scale6{
-      background-color: #99FBFF;
 
+    
+</style>
+
+<style>
+    .pp-table .scale6{
+      background-color: #56B9D0;
+      color: #3B3F42;
     }
-    .ivu-table .scale7{
-      background-color: #FFF3AD;
+    .pp-table .scale7{
+      background-color: #FFFDA4;
     }
-    .ivu-table .scale8{
-      background-color: #B23D8A;
+    .pp-table .scale8{
+      background-color: #FF5661;
       color: #fff;
     }
-    
 </style>
