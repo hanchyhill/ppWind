@@ -254,7 +254,7 @@ function getData(startTime="2017-11-02 12:00:00", endTime="2017-11-05 12:00:00",
   // let startTime = '2017-11-02 12:00:00';
   // let endTime = '2017-11-05 12:00:00';
   const config = newConfig(model);
-  console.log(config);
+  // console.log(config);
   console.log(`模式：${model}`);
   let lon = [].concat(pointW, pointC, pointE).map(v=>v[0]).join(' ');
   let lat = [].concat(pointW, pointC, pointE).map(v=>v[1]).join(' ');
@@ -264,7 +264,6 @@ function getData(startTime="2017-11-02 12:00:00", endTime="2017-11-05 12:00:00",
   return new Promise((resolve,reject)=>{
     axios.all([axios.get(mslpURL),axios.get(w6URL)])
       .then(axios.spread((res1,res2)=>{
-        console.log('test'+model);
         const data = res1.data;
         if(!data.DATA||data.RET<0) reject('气压数据为空，无法解析');
         const data2 = res2.data;
@@ -289,7 +288,6 @@ function testSameLength(first,...latter){
 }
 
 function resolveData(list,wind10m,config){ //list -> 气压序列，data2->u10m,v10m
-  console.log(config);
   const eachLength = [pointW.length, pointC.length, pointE.length];
   const totalPoints = SUM(eachLength);//一共几个点
   let pointLength = list.length/totalPoints;//每个点的时间长度

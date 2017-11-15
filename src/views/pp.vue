@@ -5,7 +5,7 @@
       <div class="layout-nav">
           
         <MenuItem name="1">
-          <Icon type="ios-navigate" size="32"></Icon>
+          <Icon class="icon-trans" type="ios-navigate" size="32"></Icon>
           <span class="larger-font">PP法冬季海上强风预测</span>
         </MenuItem>
       </div>
@@ -318,7 +318,9 @@ import Util from '../libs/util';
       font-size:175%;
     }
 
-    
+    .icon-trans{
+      transform:rotate(180deg);
+    }
 </style>
 
 <style>
