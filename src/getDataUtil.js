@@ -7,6 +7,34 @@ const pointC = [[113.75, 32.5], [113.75,30.0], [113.75,27.5], [113.75,25.0],
 const pointE = [[120.0, 32.5], [120.0,30.0], [120.0,27.5], [120.0,25.0],
                 [118.75, 25.0], [116.25, 23.75]];
 
+modelConfig = {
+  ecmwfthin:{
+    name:'ecmwfthin',
+    mslp:{name:'mslp',unitDif:1,level:'0',},
+    sufWind:{name:['u10m','v10m'], unitDif:1,level:'0',}
+  },
+  jmathin:{
+    name:'jmathin',
+    mslp:{name:'mslp',unitDif:100,level:'0',},
+    sufWind:{name:['u10m','v10m'], unitDif:1,level:'0',}
+  },
+  grapes9km:{
+    name:'grapes9km',
+    mslp:{name:'mslp',unitDif:1,level:'0',},
+    sufWind:{name:['u10m','v10m'], unitDif:1,level:'0',}
+  },
+  ncepgfs:{
+    name:'ncepgfs',
+    mslp:{name:'mslp',unitDif:1,level:'0',},
+    sufWind:{name:['u10m','v10m'], unitDif:1,level:'0',}
+  },
+}
+
+newConfig =(model='ecmwfthin')=>{
+  if(!Object.keys(modelConfig).includes(model)) throw new Error(`未在程序中找到此模式的配置文件:${model}`)
+  return modelConfig[model];
+}
+
 function SUM(data){
   return data.reduce((total, value)=>total + value, 0);
 }
@@ -220,29 +248,33 @@ function WestType(dataPack){
   };
 }
 
-function getData(startTime="2017-11-02 12:00:00", endTime="2017-11-05 12:00:00"){
+function getData(startTime="2017-11-02 12:00:00", endTime="2017-11-05 12:00:00",model='ecmwfthin'){
   // throw new Error('test');
   // let demoURL = 'http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetDataTimeSerialGroup&modelid=ecmwfthin&element=mslp&level=0&starttime=2017-10-28 12:00:00&endtime=2017-11-01 12:00:00&lon=107.5 107.5&lat=32.5 30.0';
   // let startTime = '2017-11-02 12:00:00';
   // let endTime = '2017-11-05 12:00:00';
+  const config = newConfig(model);
+  console.log(config);
+  console.log(`模式：${model}`);
   let lon = [].concat(pointW, pointC, pointE).map(v=>v[0]).join(' ');
   let lat = [].concat(pointW, pointC, pointE).map(v=>v[1]).join(' ');
-  let mslpURL = encodeURI(`http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetDataTimeSerialGroup&modelid=ecmwfthin&element=mslp&level=0&starttime=${startTime}&endtime=${endTime}&lon=${lon}&lat=${lat}`);
-  let w6URL = encodeURI(`http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=ecmwfthin&element=u10m%20v10m&level=0&starttime=${startTime}&endtime=${endTime}&lon=${pointW[5][0]}&lat=${pointW[5][1]}`);
+  let mslpURL = encodeURI(`http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetDataTimeSerialGroup&modelid=${model}&element=mslp&level=0&starttime=${startTime}&endtime=${endTime}&lon=${lon}&lat=${lat}`);
+  let w6URL = encodeURI(`http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=${model}&element=u10m%20v10m&level=0&starttime=${startTime}&endtime=${endTime}&lon=${pointW[5][0]}&lat=${pointW[5][1]}`);
   // console.log(w6URL);
   return new Promise((resolve,reject)=>{
     axios.all([axios.get(mslpURL),axios.get(w6URL)])
       .then(axios.spread((res1,res2)=>{
+        console.log('test'+model);
         const data = res1.data;
         if(!data.DATA||data.RET<0) reject('气压数据为空，无法解析');
         const data2 = res2.data;
         if(!data2.DATA||data.RET<0) reject('风速数据为空，无法解析');
-        resolve([data.DATA, data2.DATA]);
+        resolve([data.DATA, data2.DATA,config]);
         // switch case 0 1 2 -> w c e
         // return [wP, cP, eP];
       }))
       .catch(err=>{
-        reject(err);
+        reject(err.message);
       });
   }); // promise 结束
 }
@@ -256,7 +288,8 @@ function testSameLength(first,...latter){
   return true;
 }
 
-function resolveData(list,wind10m){ //list -> 气压序列，data2->u10m,v10m
+function resolveData(list,wind10m,config){ //list -> 气压序列，data2->u10m,v10m
+  console.log(config);
   const eachLength = [pointW.length, pointC.length, pointE.length];
   const totalPoints = SUM(eachLength);//一共几个点
   let pointLength = list.length/totalPoints;//每个点的时间长度
@@ -286,6 +319,13 @@ function resolveData(list,wind10m){ //list -> 气压序列，data2->u10m,v10m
   const isTheSameLength = testSameLength(...validList,...validW6)
   console.log(`is the same length? ${isTheSameLength}`);
   if(!isTheSameLength) throw new Error('不同要素有效长度不同，发生错误');
+
+  // 判断气压单位是否不同
+  if(config.mslp.unitDif!=1){
+    validList = validList.map(point=>
+      point.map(v=>[v[0],v[1]/config.mslp.unitDif]))
+  }
+
   let wP = validList.slice(0,eachLength[0]);// pointsNum,[i,v]
   let cP = validList.slice(eachLength[0],eachLength[0]+eachLength[1]);
   let eP = validList.slice(eachLength[0]+eachLength[1]);
@@ -340,12 +380,13 @@ function resolveData(list,wind10m){ //list -> 气压序列，data2->u10m,v10m
    return listMix;
 }
 
-async function getWind(start,end){
+async function getWind(start,end,model='ecmwfthin'){
   try {
-    const list = await getData(start,end);
-    return resolveData(list[0], list[1]);
+    
+    const list = await getData(start,end,model);
+    return resolveData(list[0], list[1], list[2]);
   } catch (err) {
-    throw new Error(err);
+    throw err;
   }
   
 }

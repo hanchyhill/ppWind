@@ -13,32 +13,32 @@
     起报时间
     <DatePicker type="date" :options="dateOption" :value="startDate" @on-change="(date)=>changeDate(date,0)"
     placeholder="选择日期" style="width: 150px">
-    </DatePicker>
+    </DatePicker><!--选择开始日期-->
     <Select v-model="startHour" style="width:100px">
       <Option v-for="item of validTime" :value="item.value" :key="item.value">{{ item.label }}</Option>
-    </Select>
+    </Select><!--选择开始小时-->
     结束时间
     <DatePicker type="date" :options="dateOption" :value="endDate" @on-change="(date)=>changeDate(date,1)"
-    placeholder="选择日期" style="width: 150px">
+    placeholder="选择日期" style="width: 150px"><!--选择结束日期-->
     </DatePicker>
-    <Select v-model="endHour" style="width:100px">
+    <Select v-model="endHour" style="width:100px"><!--选择结束小时-->
       <Option v-for="item of validTime" :value="item.value" :key="item.value">{{ item.label }}</Option>
     </Select>
-    <Select v-model="modelSelected" style="width:150px">
-        <Option v-for="item in modelList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+    <Select v-model="modelSelected" style="width:150px"><!--选择模式-->
+        <Option v-for="item in modelList" :value="item.value" :key="item.value" :disabled='item.disabled?true:false'>{{ item.label }}</Option>
     </Select>
     <br>
     <Button type="primary" icon="ios-search" @click.native = "getData">查询</Button>
     <Button type="primary" icon="images">图形显示</Button>
-    <Select v-model="timeInterval" style="width:150px">
-        <Option v-for="item in intervalList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+    <Select v-model="timeInterval" style="width:125px"><!--选择时间间隔-->
+        <Option v-for="item in intervalList" :value="item.value" :key="item.value">{{item.label}}</Option>
     </Select>
     
     <!--<Row type="flex" justify="center" align="middle">-->
     <Row type="flex" >
       <Col span="1"></Col>
       <Col span="22">
-        <Table :columns="tableTitle" :data="tableData" height="800" :loading="tableLoading" class="pp-table">
+        <Table :columns="tableTitle" :data="tableData" height="850" :loading="tableLoading" class="pp-table">
         </Table>
       </Col>
       <Col span="1"></Col>
@@ -62,13 +62,15 @@ import Util from '../libs/util';
                        {time:'10月29日11时',east:'8级',middle:'7级', west:'6级'},
                        {time:'10月30日02时',east:'7级',middle:'6级',type:'东部型'}]; */
       const intervalList = [{value:1,label:'所有时次',},
+                            {value:3,label:'3小时间隔',},
                             {value:6,label:'6小时间隔',},
                             {value:12,label:'12小时间隔',},];// 时间间隔
 
-      const modelList = [{value:'ecmwfthin',label:'EC细网格',},
-                         {value:'necp',label:'NCEP-GFS',},
-                         {value:'jmathin',label:'日本',},
-                         {value:'grapes9km',label:'Grapes9km',},];// 模式选择
+      const modelList = [{value:'ecmwfthin',label:'EC细网格',},                         
+                         {value:'jmathin',label:'日本细网格',},
+                         {value:'grapes9km',label:'Grapes9km',},
+                         {value:'ncepgfs',label:'NCEP-GFS',disabled:true,},
+                        ];// 模式选择
 
       const dateOption = {
         shortcuts: [
@@ -106,12 +108,12 @@ import Util from '../libs/util';
                       (Array(2).join('0') + (iniTime.getDate()+suffixTime.date)).slice(-2);
       let endDate = iniTime.getFullYear().toString() + '-' +
                     (Array(2).join('0') + (iniTime.getMonth()+1)).slice(-2) + '-' +
-                    (Array(2).join('0') + (iniTime.getDate()+suffixTime.date+5)).slice(-2);
+                    (Array(2).join('0') + (iniTime.getDate()+suffixTime.date+7)).slice(-2);
       let [startHour,endHour] = [suffixTime.hour,suffixTime.hour];
 
       return {
         tableTitle,
-        timeInterval:1,
+        timeInterval:6,
         intervalList,
         modelList,
         modelSelected:'ecmwfthin',
@@ -128,9 +130,9 @@ import Util from '../libs/util';
     },
     methods: {
       getData(){
-        let fullUrl = `http://localhost:10073/api/getData?start=${this.startString}&end=${this.endString}&model=ecthin`;
-        console.log(fullUrl);
-        let reqUrl = `/api/getData?start=${this.startString}&end=${this.endString}&model=ecthin`;
+        //let fullUrl = `http://localhost:10073/api/getData?start=${this.startString}&end=${this.endString}&model=${this.modelSelected}`;
+        //console.log(fullUrl);
+        let reqUrl = `/api/getData?start=${this.startString}&end=${this.endString}&model=${this.modelSelected}`;
         //axios.get('http://localhost:10073/api/getData?start=2017-10-28 12:00:00&end=2017-11-01 12:00:00')
         this.$Notice.open({
           title: '正在查询',
@@ -154,7 +156,7 @@ import Util from '../libs/util';
               desc:err.response.data?err.response.data:err,
               duration: 5,
           });
-          console.error(err);
+          console.error(err.response.data?err.response.data:err);
         })
       },
       projectScale(wind){
@@ -320,10 +322,10 @@ import Util from '../libs/util';
 </style>
 
 <style>
-    .pp-table .scale6{
+    /*.pp-table .scale6{
       background-color: #56B9D0;
       color: #3B3F42;
-    }
+    }*/
     .pp-table .scale7{
       background-color: #FFFDA4;
     }

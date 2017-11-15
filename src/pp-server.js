@@ -17,13 +17,14 @@ apiRouter.route('/:apiName')
     case 'getData': // 获取数据
       const startTime = req.query.start;
       const endTime = req.query.end;
-      getWind(startTime, endTime)
+      const model = req.query.model;
+      getWind(startTime, endTime, model)
       .then(resData=>{
         res.send(JSON.stringify(resData))
       })
       .catch(error=>{
         console.log(error);
-        res.status(503).send(error.message);
+        res.status(503).send(error.message?error.message:error);
       })
       break;
     default:// 未获取到时跳到下一个
