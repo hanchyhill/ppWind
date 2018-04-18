@@ -1,10 +1,6 @@
 /**
-<<<<<<< HEAD
 
  * update 2018 04 18 
-=======
- * update 2018 01 24
->>>>>>> b0b2fbafa2a03a125dbdd1576389bbfede3eda4c
  */
 const axios = require('axios');
 
@@ -76,11 +72,7 @@ const MiddleType= (dataPack) => {
   const pc5w6 = dataPack.pc5w6;
 // 1-> 6级; 2 -> 7级; 3 -> 8级; 4 -> 6级及以上;7 -> 7级及以上; 0 -> 无大风
   function middleWest(pw5w6, w6){// 中西部偏北风
-<<<<<<< HEAD
     if(pw5w6 > 4.0 && pw5w6 <= 7.0 && w6){
-=======
-    if(pw5w6 < 4.0 && pw5w6 <= 7.0 && w6){
->>>>>>> b0b2fbafa2a03a125dbdd1576389bbfede3eda4c
       return 1;
     }
     else if(pw5w6>7.0 && pw5w6<9.5 && w6){
@@ -110,11 +102,7 @@ const MiddleType= (dataPack) => {
   };
 
   function middle(pw5w6, pe5c5){// 中部偏东风
-<<<<<<< HEAD
     if(pw5w6>0 && pw5w6<3.7 && pe5c5>=2.2 && pe5c5 < 4.5){
-=======
-    if(pw5w6<3.7 && pe5c5>=2.2 && pe5c5 < 4.5){
->>>>>>> b0b2fbafa2a03a125dbdd1576389bbfede3eda4c
       return 1;
     }
     else if(pw5w6>0 && pw5w6<3.7 && pe5c5 >= 4.5){
@@ -126,11 +114,7 @@ const MiddleType= (dataPack) => {
   };
 
   function west(pw5w6, pc5w6){// 西部偏东风
-<<<<<<< HEAD
     if(pw5w6>0 && pw5w6<3.7 && pc5w6 >=3){
-=======
-    if(pw5w6<3.7 && pc5w6 >=3){
->>>>>>> b0b2fbafa2a03a125dbdd1576389bbfede3eda4c
       return 4;
     }
     else{
@@ -187,11 +171,7 @@ function EastType(dataPack){
   };
 
   function middle(pw5w6, pe5c5){// 中部偏东风
-<<<<<<< HEAD
     if(pw5w6>0&&pw5w6<3.7&&pe5c5>=2.2&&pe5c5<4.5){
-=======
-    if(pw5w6<3.7&&pe5c5>=2.2&&pe5c5<4.5){
->>>>>>> b0b2fbafa2a03a125dbdd1576389bbfede3eda4c
       return 1;
     }
     else if(pw5w6>0&&pw5w6<3.7&&pe5c5>=4.5){
@@ -203,11 +183,7 @@ function EastType(dataPack){
   }
 
   function west(pw5w6, pc5w6){// 西部偏东风
-<<<<<<< HEAD
     if(pw5w6>0&&pw5w6<3.7&&pc5w6>=3){
-=======
-    if(pw5w6<3.7&&pc5w6>=3){
->>>>>>> b0b2fbafa2a03a125dbdd1576389bbfede3eda4c
       return 4;// 4 ->6级及以上
     }
     else{
