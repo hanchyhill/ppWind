@@ -1,6 +1,6 @@
 {
   "name": "ppWind",
-  "version": "1.0.2",
+  "version": "1.2.0",
   "description": "PP法项目",
   "main": "index.js",
   "scripts": {
