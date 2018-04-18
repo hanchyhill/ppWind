@@ -1,3 +1,7 @@
+/**
+
+ * update 2018 04 18 
+ */
 const axios = require('axios');
 
 const pointW = [[107.5,32.5], [107.5,30.0], [107.5,27.5], [107.5,25.0],
@@ -48,7 +52,7 @@ function findMax(a0, a1, a2){
 }
 
 function isNorthWind(u,v){
-  return v<0 && Math.abs(v)/Math.abs(u)>=1? true:false;
+  return (v<0) && (Math.abs(v)/Math.abs(u)>=1);
 }
 
 /* function whichType(w,c,e){
@@ -67,14 +71,14 @@ const MiddleType= (dataPack) => {
   const pe5c5 = dataPack.pe5c5;
   const pc5w6 = dataPack.pc5w6;
 // 1-> 6级; 2 -> 7级; 3 -> 8级; 4 -> 6级及以上;7 -> 7级及以上; 0 -> 无大风
-  function middleWest(pw5w6, w6){
-    if(pw5w6 < 4.0 && pw5w6 <= 7.0 && w6){
+  function middleWest(pw5w6, w6){// 中西部偏北风
+    if(pw5w6 > 4.0 && pw5w6 <= 7.0 && w6){
       return 1;
     }
     else if(pw5w6>7.0 && pw5w6<9.5 && w6){
       return 2;
     }
-    else if(pw5w6>=9.5){
+    else if(pw5w6>=9.5 && w6){
       return 3;
     }
     else{
@@ -82,7 +86,7 @@ const MiddleType= (dataPack) => {
     }
   };
 
-  function east(pw5w6, pe3e6){
+  function east(pw5w6, pe3e6){// 东部东北风
     if( (pw5w6 >= 7.0 && pe3e6 <= 7.0 && pe3e6>=4.8) || (pe3e6>=3.0&&pe3e6<=7) ){
       return 1;
     }
@@ -97,11 +101,11 @@ const MiddleType= (dataPack) => {
     }
   };
 
-  function middle(pw5w6, pe5c5){
-    if(pw5w6<3.7 && pe5c5>=2.2 && pe5c5 < 4.5){
+  function middle(pw5w6, pe5c5){// 中部偏东风
+    if(pw5w6>0 && pw5w6<3.7 && pe5c5>=2.2 && pe5c5 < 4.5){
       return 1;
     }
-    else if(pw5w6<3.7 && pe5c5 >= 4.5){
+    else if(pw5w6>0 && pw5w6<3.7 && pe5c5 >= 4.5){
       return 5;
     }
     else{
@@ -109,8 +113,8 @@ const MiddleType= (dataPack) => {
     }
   };
 
-  function west(pw5w6, pc5w6){
-    if(pw5w6<3.7 && pc5w6 >=3){
+  function west(pw5w6, pc5w6){// 西部偏东风
+    if(pw5w6>0 && pw5w6<3.7 && pc5w6 >=3){
       return 4;
     }
     else{
@@ -139,7 +143,7 @@ function EastType(dataPack){
   const pe3e6 = dataPack.pe3e6;
   const pe5c5 = dataPack.pe5c5;
   const pc5w6 = dataPack.pc5w6;
-  function middleWest(pw5w6){
+  function middleWest(pw5w6){// 中西部偏北风
     if(pw5w6>5 && pw5w6<=7){
       return 1;
     }
@@ -151,7 +155,7 @@ function EastType(dataPack){
     }
   }
 
-  function east(pe3e6){
+  function east(pe3e6){// 东部东北风
     if(pe3e6>=3 && pe3e6<=7){
       return 1;
     }
@@ -166,11 +170,11 @@ function EastType(dataPack){
     }
   };
 
-  function middle(pw5w6, pe5c5){
-    if(pw5w6<3.7&&pe5c5>=2.2&&pe5c5<4.5){
+  function middle(pw5w6, pe5c5){// 中部偏东风
+    if(pw5w6>0&&pw5w6<3.7&&pe5c5>=2.2&&pe5c5<4.5){
       return 1;
     }
-    else if(pw5w6<3.7&&pe5c5>=4.5){
+    else if(pw5w6>0&&pw5w6<3.7&&pe5c5>=4.5){
       return 5;
     }
     else{
@@ -178,9 +182,9 @@ function EastType(dataPack){
     }
   }
 
-  function west(pw5w6, pc5w6){
-    if(pw5w6<3.7&&pc5w6>=3){
-      return 4;
+  function west(pw5w6, pc5w6){// 西部偏东风
+    if(pw5w6>0&&pw5w6<3.7&&pc5w6>=3){
+      return 4;// 4 ->6级及以上
     }
     else{
       return 0;
@@ -209,14 +213,14 @@ function WestType(dataPack){
   const pe3e6 = dataPack.pe3e6;
   const pe5c5 = dataPack.pe5c5;
   const pc5w6 = dataPack.pc5w6;
-  function middleWest(pw5w6,w6){
+  function middleWest(pw5w6,w6){// 中西部偏北风
     if(pw5w6>4 && pw5w6<=7 && w6){
       return 1;
     }
     else if(pw5w6>7 && pw5w6<9.5 && w6){
       return 2;
     }
-    else if(pw5w6>=9.5){
+    else if(pw5w6>=9.5 && w6){
       return 3;
     }
     else{
@@ -224,7 +228,7 @@ function WestType(dataPack){
     }
   };
 
-  function east(pe3e6){
+  function east(pe3e6){// 东部东北风
     if(pe3e6>=4 && pe3e6 <=7){
       return 1;
     }
