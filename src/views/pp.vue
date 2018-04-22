@@ -229,7 +229,7 @@ import Util from '../libs/util';
       },
       changePostTime(){
         this.postStartTime = this.startDate.split('-').map(num=>parseInt(num));
-        this.postStartTime.push(parseInt(this.endHour));
+        this.postStartTime.push(parseInt(this.startHour));
       },
       projectTime(hour){
         const time = this.postStartTime;
