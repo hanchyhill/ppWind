@@ -10,8 +10,8 @@ util.title = function(title) {
 };
 
 const protocol = location.protocol;
-
-const ajaxUrl = env === 'development' ?
+const isLocal = location.host.search(/8080/)===-1?false:true;
+const ajaxUrl = isLocal ?
     protocol + '//127.0.0.1:10073' :
     env === 'production' ?
     protocol + '//pp.gdmo.gq' :
@@ -22,5 +22,4 @@ util.ajax = axios.create({
     baseURL: ajaxUrl,
     timeout: 30000
 });
-
 export default util;
